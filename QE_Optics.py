@@ -126,30 +126,65 @@ def plotter(xlabel, ylabel, plot_title):
     plt.show()
 
 
-os.chdir("./MgAl2O4/EPSILON")
+os.chdir("./18ks")
 fig, ax = plt.subplots(3, 2, sharex=True)
-ax[0, 0].plot(energy("epsr_MgAl2O4.dat"), magnitude("epsr_MgAl2O4.dat"), color='Red')  # Real
+ax[0, 0].plot(energy("epsr_MgAl2O4.dat"), magnitude("epsr_MgAl2O4.dat"), color='Pink')  # Real
 ax[0, 0].title.set_text('Real part of Dielectric Function')
 ax[0, 0].set_ylabel("$\epsilon_{1}(\omega)$")
 
-ax[0, 1].plot(energy("epsr_MgAl2O4.dat"), magnitude("epsi_MgAl2O4.dat"), color='Blue')  # Imaginary
+ax[0, 1].plot(energy("epsi_MgAl2O4.dat"), magnitude("epsi_MgAl2O4.dat"), color='Cyan')  # Imaginary
 ax[0, 1].title.set_text('Imaginary part of Dielectric Function')
 ax[0, 1].set_ylabel("$\epsilon_{2}(\omega)$")
 
-ax[1, 0].plot(energy("epsr_MgAl2O4.dat"), refractive_index("epsr_MgAl2O4.dat", "epsi_MgAl2O4.dat"), color='Green')  # Refractive Index
+ax[1, 0].plot(energy("epsr_MgAl2O4.dat"), refractive_index("epsr_MgAl2O4.dat", "epsi_MgAl2O4.dat"), color='Lime')
+#Refractive Index
 ax[1, 0].title.set_text('Refractive Index')
 ax[1, 0].set_ylabel("$n(\omega)$")
 
-ax[1, 1].plot(energy("epsr_MgAl2O4.dat"), extinction("epsr_MgAl2O4.dat", "epsi_MgAl2O4.dat"), color='Orange')  # Absorption Coefficient
+ax[1, 1].plot(energy("epsr_MgAl2O4.dat"), extinction("epsr_MgAl2O4.dat", "epsi_MgAl2O4.dat"), color='Yellow')  #
+# Absorption Coefficient
 ax[1, 1].title.set_text('Absorption Coefficient')
 ax[1, 1].set_ylabel("a.u.")
 
-ax[2, 0].plot(energy("epsr_MgAl2O4.dat"), reflectivity("epsr_MgAl2O4.dat", "epsi_MgAl2O4.dat"), color='Gray')  # Reflectivity
+ax[2, 0].plot(energy("epsr_MgAl2O4.dat"), reflectivity("epsr_MgAl2O4.dat", "epsi_MgAl2O4.dat"), color=(0.1, 0.1, 0.1, 1))  #
+# Reflectivity
 ax[2, 0].title.set_text('Reflectivity')
 ax[2, 0].set_ylabel("$R(\omega)$")
 ax[2, 0].set_xlabel("Energy / eV")
 
-ax[2, 1].plot(energy("epsr_MgAl2O4.dat"), energy_loss("epsr_MgAl2O4.dat", "epsi_MgAl2O4.dat"), color='Black')  # Energy Loss Spectrum
+ax[2, 1].plot(energy("epsr_MgAl2O4.dat"), energy_loss("epsr_MgAl2O4.dat", "epsi_MgAl2O4.dat"), color='Gray')  #
+# Energy Loss Spectrum
+ax[2, 1].title.set_text('Energy Loss Spectrum')
+ax[2, 1].set_ylabel("$L(\omega)$")
+ax[2, 1].set_xlabel("Energy / eV")
+
+os.chdir("../nosym/")
+ax[0, 0].plot(energy("epsr_MgAl2O4.dat"), magnitude("epsr_MgAl2O4.dat"), color='Red')  # Real
+ax[0, 0].title.set_text('Real part of Dielectric Function')
+ax[0, 0].set_ylabel("$\epsilon_{1}(\omega)$")
+
+ax[0, 1].plot(energy("epsi_MgAl2O4.dat"), magnitude("epsi_MgAl2O4.dat"), color='Blue')  # Imaginary
+ax[0, 1].title.set_text('Imaginary part of Dielectric Function')
+ax[0, 1].set_ylabel("$\epsilon_{2}(\omega)$")
+
+ax[1, 0].plot(energy("epsr_MgAl2O4.dat"), refractive_index("epsr_MgAl2O4.dat", "epsi_MgAl2O4.dat"), color='Green')
+#Refractive Index
+ax[1, 0].title.set_text('Refractive Index')
+ax[1, 0].set_ylabel("$n(\omega)$")
+
+ax[1, 1].plot(energy("epsr_MgAl2O4.dat"), extinction("epsr_MgAl2O4.dat", "epsi_MgAl2O4.dat"), color='Orange')  #
+# Absorption Coefficient
+ax[1, 1].title.set_text('Absorption Coefficient')
+ax[1, 1].set_ylabel("a.u.")
+
+ax[2, 0].plot(energy("epsr_MgAl2O4.dat"), reflectivity("epsr_MgAl2O4.dat", "epsi_MgAl2O4.dat"), color='Gray')  #
+# Reflectivity
+ax[2, 0].title.set_text('Reflectivity')
+ax[2, 0].set_ylabel("$R(\omega)$")
+ax[2, 0].set_xlabel("Energy / eV")
+
+ax[2, 1].plot(energy("epsr_MgAl2O4.dat"), energy_loss("epsr_MgAl2O4.dat", "epsi_MgAl2O4.dat"), color='Black')  #
+# Energy Loss Spectrum
 ax[2, 1].title.set_text('Energy Loss Spectrum')
 ax[2, 1].set_ylabel("$L(\omega)$")
 ax[2, 1].set_xlabel("Energy / eV")

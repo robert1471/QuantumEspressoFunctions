@@ -64,7 +64,8 @@ def bndplot(datafile, fermi, symmetryfile, subplot, species, colour, number):
 
 fig, axs = plt.subplots()
 
-os.chdir("./MgAl2O4/BANDS")
+os.chdir("./18ks/")
 bndplot("MgAl2O4.bands.dat.gnu", "5.5934", "bandx.out", axs, "MgAl$_2$O$_4$", "black", 1)
+bndplot("MgAl2O4.bands.dat.gnu.14", "5.5934", "bandx.out", axs, "MgAl$_2$O$_4$", "red", 1)
 
 plt.show()
