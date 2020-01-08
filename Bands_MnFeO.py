@@ -22,9 +22,6 @@ def Symmetries(fstring):
 
 syms = ["$\Gamma$", "X", "W", "K", "$\Gamma$", "L", "U", "W", "L", "K", "U", "X", "$\Gamma$"]
 
-hubbards = [4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8]
-bandgaps = []
-
 
 def bndplot(datafile, fermi, symmetryfile, subplot, species, colour):
     z = np.loadtxt(datafile)  # This loads the bandx.dat.gnu file
@@ -44,10 +41,8 @@ def bndplot(datafile, fermi, symmetryfile, subplot, species, colour):
             bands[j][i][0] = x[i]
             bands[j][i][1] = np.multiply(sel[j][1], 1)
 
-    mins = []
-    maxs = []
-
     for i in bands:  # Here we plots the bands
+        print(i[:, 0])
         subplot.plot(i[:, 0], i[:, 1] - Fermi, lw=0.75, color=colour)
 
     temp = Symmetries(symmetryfile)
@@ -69,24 +64,23 @@ def bndplot(datafile, fermi, symmetryfile, subplot, species, colour):
     subplot.set_ylim(5, 12)
 
 
+fig, axs = plt.subplots(1, 1)
 
-fig, axs = plt.subplots(1, 10)
+os.chdir("./MnFe2O4")
+bndplot("MnFeO22.bands.dat.gnu", "5.5934", "bandx.out", axs, "NiO", "black")
 
-os.chdir("./results.hubbard/")
-#bndplot("hub-4/NiO.bands.dat.gnu", "13.4442", "hub-4/bandx.out", axs, "NiO", "black")
+'''print([x[0] for x in os.walk("./")])
 
-print([x[0] for x in os.walk("./")])
-Fermis = [13.4442, 13.2948, 14.5226, 15.7734, 15.5759, 15.3654, 15.1462, 14.9801, 14.7913]
-for j, x in enumerate(os.walk("./")):
+for i, x in enumerate(os.walk("./")):
     if x[0] == './':
         continue
     else:
         print(x[0])
         os.chdir(x[0])
-        bndplot("NiO.bands.dat.gnu", Fermis[j - 1], "bandx.out", axs[j], "NiO", "black")
-        os.chdir("../")
+        bndplot("NiO.bands.dat.gnu", "5.5934", "bandx.out", axs[i], "NiO", "black")
+        os.chdir("../")'''
 #bndplot("MgAl2O4.bands.dat.gnu", "5.5934", "bandx.out", axs, "MgAl$_2$O$_4$", "black", 1)
 #bndplot("MgAl2O4.bands.dat.gnu.14", "5.5934", "bandx.out", axs, "MgAl$_2$O$_4$", "red", 1)
 
-print(bandgaps)
+
 plt.show()
