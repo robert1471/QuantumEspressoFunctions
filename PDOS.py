@@ -43,18 +43,18 @@ def PDOS_plot():
     Ni2p = PDOS("Ni2", "p")
     Ni2d = PDOS("Ni2", "d")
 
-    x_axis = pd.read_csv('./PDOS/NiO.pdos_tot', delimiter='\s+', header=None, usecols=[0],
-                         skiprows=1, names=["E"])
+    #x_axis = pd.read_csv('./PDOS/NiO.pdos_tot', delimiter='\s+', header=None, usecols=[0],
+     #                    skiprows=1, names=["E"])
 
-    y_axis1 = pd.read_csv('./PDOS/NiO.pdos_tot', delimiter='\s+', header=None, usecols=[1],
-                         skiprows=1, names=["U"])
+    #y_axis1 = pd.read_csv('./PDOS/NiO.pdos_tot', delimiter='\s+', header=None, usecols=[1],
+    #                     skiprows=1, names=["U"])
 
-    y_axis2 = pd.read_csv('./PDOS/NiO.pdos_tot', delimiter='\s+', header=None, usecols=[1],
-                         skiprows=1, names=["D"])
+    #y_axis2 = pd.read_csv('./PDOS/NiO.pdos_tot', delimiter='\s+', header=None, usecols=[1],
+    #                     skiprows=1, names=["D"])
 
     plt.plot(x_axis, y_axis1)
     plt.plot(x_axis, y_axis2)
-    '''plt.subplot(3, 1, 1)
+    plt.subplot(3, 1, 1)
 
     plt.plot(x_axis, Os.iloc[:, 0], label='O$_s$', lw=1)
     plt.plot(x_axis, Op.iloc[:, 0], label='O$_p$', lw=1)
@@ -76,7 +76,7 @@ def PDOS_plot():
 
     plt.plot(x_axis, Ni2s.iloc[:, 0], label='Ni2$_s$', lw=1)
     #plt.plot(x_axis, Ni2p.iloc[:, 0], label='Ni2$_p$', lw=1)
-    plt.plot(x_axis, Ni2d.iloc[:, 0], label='Ni2$_d$', lw=1)'''
+    plt.plot(x_axis, Ni2d.iloc[:, 0], label='Ni2$_d$', lw=1)
 
     plt.axvline(10.837, color="red", label="E$_{Fermi}$", lw=1)
     plt.xlabel("Energy / eV", fontsize=16)
