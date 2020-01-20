@@ -100,5 +100,3 @@ def energy_loss(epsr_file, epsi_file):
         df.loc[i] = [n_ij]
     return df
 
-
-plot_tile = "Absorption Spectrum for MgAl$_2$O$_4$"
