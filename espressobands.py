@@ -19,7 +19,7 @@ def Symmetries(fstring):
 # It then extracts the band data, and plots the bands, the fermi energy in red, and the high symmetry points
 
 
-def bandplot(datafile, fermi, symmetryfile, subplot, colour, highsympoints, label):
+def bandplot(datafile, fermi, symmetryfile, subplot, colour, highsympoints, label, labelloc):
     z = np.loadtxt(datafile)  # This loads the bandx.dat.gnu file
     x = np.unique(z[:, 0])  # This is all the unique x-points
     bands = []
@@ -50,14 +50,14 @@ def bandplot(datafile, fermi, symmetryfile, subplot, colour, highsympoints, labe
         x1 = [j, j]
         x2 = [axis[2] - 50, axis[3] + 50]
         subplot.plot(x1, x2, '--', lw=0.55, color='blue', alpha=0.9)
-        subplot.text(j, - Fermi - 0.5, highsympoints[val], va='center', ha='center', fontsize=12)
+        subplot.text(j, labelloc, highsympoints[val], va='center', ha='center', fontsize=10)
         val += 1
 
     subplot.plot([min(x), max(x)], [Fermi - Fermi, Fermi - Fermi], '--', lw=1, color="red", zorder=0)
     subplot.set_xticklabels([])
     subplot.set_ylim(-Fermi, Fermi)
     subplot.set_xlim([axis[0], axis[1]])
-    subplot.set_ylabel('E - E$_\mathregular{f}$ / eV', fontsize=16)
+    subplot.set_ylabel(r'E - E\textsubscript{f} / eV', fontsize=16)
 
 
 def bandgap(datafile, fermi, subplot):
