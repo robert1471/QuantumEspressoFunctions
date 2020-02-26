@@ -8,15 +8,17 @@ from matplotlib import pyplot as plt
 # This function extracts the high symmetry points from the output of bandx.out
 from numpy.core.multiarray import ndarray
 
+class BandFunctions:
+    def __init__(self, ):
 
-def Symmetries(fstring):
-    f = open(fstring, 'r')
-    x = np.zeros(0)
-    for i in f:
-        if "high-symmetry" in i:
-            x = np.append(x, float(i.split()[-1]))
-    f.close()
-    return x
+    def Symmetries(self, fstring):
+        f = open(fstring, 'r')
+        x = np.zeros(0)
+        for i in f:
+            if "high-symmetry" in i:
+                x = np.append(x, float(i.split()[-1]))
+        f.close()
+        return x
 
 
 # This function takes in the datafile, the fermi energy, the symmetry file, a subplot, and the label
@@ -96,19 +98,11 @@ def bandgap(datafile, fermi):
 
 def band_plot_diagram(system, ax_title="Untitled", data_loc="./", high_sym_points=None, fermi=0,
                       color1="red", color2="darkorange", owd=os.getcwd(), cols=1, rows=1, ax=0):
-    global fig
-    global axs
-
-    # figure set up or check if file already defined to exist
+    
+    # figure set up
     if "fig" in globals():
-        print("Already Done")
-    else:
-        fig, axs = plt.subplots(cols, rows, figsize=(6.4 * 2, 6.4), dpi=250)
-
-    if rows and cols == 1:
-        a = axs
-    else:
-        a = axs[ax]
+        print("")
+    fig, axs = plt.subplots(cols, rows, figsize=(6.4 * 2, 6.4), dpi=250)
 
     # change to data location
     os.chdir(data_loc)
@@ -118,18 +112,18 @@ def band_plot_diagram(system, ax_title="Untitled", data_loc="./", high_sym_point
     band_gap_2 = bandgap("2.{}.bands.dat.gnu".format(system), fermi)
 
     # plot bands
-    band_plot("1.{}.bands.dat.gnu".format(system), fermi, "1.bandx.out", a, color1, high_sym_points,
+    band_plot("1.{}.bands.dat.gnu".format(system), fermi, "1.bandx.out", axs, color1, high_sym_points,
               r"Spin up (E\textsubscript{{g}} = {} eV)".format(round(band_gap_1, 2)), -(fermi + 1))
-    band_plot("2.{}.bands.dat.gnu".format(system), fermi, "2.bandx.out", a, color2, high_sym_points,
+    band_plot("2.{}.bands.dat.gnu".format(system), fermi, "2.bandx.out", axs, color2, high_sym_points,
               r"Spin down (E\textsubscript{{g}} = {} eV)".format(round(band_gap_2, 2)), -(fermi + 1))
 
     # style
-    a.set_ylim((-10.5, 5))
-    a.set_xlabel("Wave Vector", fontsize=16, y=-1)
-    a.xaxis.set_ticks_position('none')
-    a.xaxis.set_label_coords(0.5, -0.065)
-    a.legend(framealpha=1)
-    a.set_title(ax_title, fontsize=20)
+    axs.set_ylim((-10.5, 5))
+    axs.set_xlabel("Wave Vector", fontsize=16, y=-1)
+    axs.xaxis.set_ticks_position('none')
+    axs.xaxis.set_label_coords(0.5, -0.065)
+    axs.legend(framealpha=1)
+    axs.set_title(ax_title, fontsize=20)
 
     # change directory home
     os.chdir(owd)
