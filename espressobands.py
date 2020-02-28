@@ -95,20 +95,21 @@ def bandgap(datafile, fermi):
 
 
 def band_plot_diagram(system, ax_title="Untitled", data_loc="./", high_sym_points=None, fermi=0,
-                      color1="red", color2="darkorange", owd=os.getcwd(), cols=1, rows=1, ax=0):
+                      color1="red", color2="darkorange", owd=os.getcwd(), rows=1, cols=1, ax_a=0, ax_b=None):
     global fig
     global axs
 
     # figure set up or check if file already defined to exist
-    if "fig" in globals():
-        print("Already Done")
-    else:
-        fig, axs = plt.subplots(cols, rows, figsize=(6.4 * 2, 6.4), dpi=250)
+    if "fig" not in globals():
+        fig, axs = plt.subplots(rows, cols, figsize=(6.4 * 2, 6.4), dpi=250)
 
-    if rows and cols == 1:
+    # if statement to allow for single figure, 1D and 2D subplots
+    if rows == 1 and cols == 1:
         a = axs
+    elif rows == 1 or cols == 1:
+        a = axs[ax_a]
     else:
-        a = axs[ax]
+        a = axs[ax_a, ax_b]
 
     # change to data location
     os.chdir(data_loc)
