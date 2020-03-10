@@ -23,7 +23,7 @@ def Symmetries(fstring):
 # It then extracts the band data, and plots the bands, the fermi energy in red, and the high symmetry points
 
 
-def band_plot(datafile, fermi, symmetryfile, subplot, colour, highsympoints, label, labelloc):
+def band_plot(datafile, fermi, symmetryfile, subplot, colour, highsympoints, label, labelloc, zorder=0):
     z = np.loadtxt(datafile)  # This loads the bandx.dat.gnu file
     x = np.unique(z[:, 0])  # This is all the unique x-points
     bands = []
@@ -53,11 +53,11 @@ def band_plot(datafile, fermi, symmetryfile, subplot, colour, highsympoints, lab
     for j in temp:  # This is the high symmetry lines
         x1 = [j, j]
         x2 = [axis[2] - 50, axis[3] + 50]
-        subplot.plot(x1, x2, '--', lw=0.55, color='blue', alpha=0.9)
+        subplot.plot(x1, x2, '--', lw=0.55, color='blue', alpha=0.9, zorder=0)
         subplot.text(j, labelloc, highsympoints[val], va='center', ha='center', fontsize=10)
         val += 1
 
-    subplot.plot([min(x), max(x)], [Fermi - Fermi, Fermi - Fermi], '--', lw=1, color="red", zorder=0)
+    subplot.plot([min(x), max(x)], [Fermi - Fermi, Fermi - Fermi], '--', lw=1, color="red", zorder=zorder)
     subplot.set_xticklabels([])
     subplot.set_ylim(-Fermi, Fermi)
     subplot.set_xlim([axis[0], axis[1]])
@@ -95,7 +95,7 @@ def bandgap(datafile, fermi):
 
 
 def band_plot_diagram(system, ax_title="Untitled", data_loc="./", high_sym_points=None, fermi=0,
-                      color1="red", color2="darkorange", owd=os.getcwd(), rows=1, cols=1, ax_a=0, ax_b=None):
+                      color1="red", color2="darkblue", owd=os.getcwd(), rows=1, cols=1, ax_a=0, ax_b=None, zorder=0):
     global fig
     global axs
 
@@ -119,10 +119,11 @@ def band_plot_diagram(system, ax_title="Untitled", data_loc="./", high_sym_point
     band_gap_2 = bandgap("2.{}.bands.dat.gnu".format(system), fermi)
 
     # plot bands
-    band_plot("1.{}.bands.dat.gnu".format(system), fermi, "1.bandx.out", a, color1, high_sym_points,
-              r"Spin up (E\textsubscript{{g}} = {} eV)".format(round(band_gap_1, 2)), -(fermi + 1))
     band_plot("2.{}.bands.dat.gnu".format(system), fermi, "2.bandx.out", a, color2, high_sym_points,
-              r"Spin down (E\textsubscript{{g}} = {} eV)".format(round(band_gap_2, 2)), -(fermi + 1))
+              r"Spin down (E\textsubscript{{g}} = {} eV)".format(round(band_gap_2, 2)), -(fermi + 1), zorder=9)
+    band_plot("1.{}.bands.dat.gnu".format(system), fermi, "1.bandx.out", a, color1, high_sym_points,
+              r"Spin up (E\textsubscript{{g}} = {} eV)".format(round(band_gap_1, 2)), -(fermi + 1), zorder=100)
+
 
     # style
     a.set_ylim((-10.5, 5))

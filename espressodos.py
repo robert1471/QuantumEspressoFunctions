@@ -36,6 +36,7 @@ def pdos(atom, orbital, spin=None):
         else:
             continue
     df_master = df_master.sum(axis=1)
+    print(df_master)
     return df_master
 
 
@@ -47,7 +48,9 @@ def axis(pdos_file, row=0):
 
 
 def pdos_plot_diagram(system, element=None, orbitals=[], spin_polarised=True, ax_title="Untitled", data_loc="./",
-                      owd=os.getcwd(), fermi=0, rows=1, cols=1, ax_a=None, ax_b=None, color=(0, 0, 0)):
+                      owd=os.getcwd(), fermi=0, rows=1, cols=1, ax_a=None, ax_b=None, color=(0, 0, 0),
+                      tot_color=(0, 0, 0),
+                      labela="Spin Up", labelb="Spin Down", total_dos=False):
     global fig
     global axs
 
@@ -71,10 +74,13 @@ def pdos_plot_diagram(system, element=None, orbitals=[], spin_polarised=True, ax
         else:
             a = axs[ax_a, ax_b]
 
+        a.axvline(0, lw=0.5, color="Red", zorder=10, ls="-")
         # plot total dos
-        a.axhline(0, lw=0.5, color="black", zorder=10)
-        a.plot(x_total_axis, y_total_axis_up, label="Total Up", color=(0, 0, 0), lw=0.5)
-        a.plot(x_total_axis, -y_total_axis_down, label="Total Down", color=(0, 0, 0), lw=0.5)
+        if total_dos:
+            a.plot(x_total_axis, y_total_axis_up, label="Total", color=tot_color, lw=0.5)
+            a.plot(x_total_axis, -y_total_axis_down, label=None, color=tot_color, lw=0.5)
+            a.fill_between(x_total_axis["E"], y_total_axis_up["E"], color="black", alpha=0.1)
+            a.fill_between(x_total_axis["E"], -y_total_axis_down["E"], color="black", alpha=0.1)
 
     else:
         # if statement to allow for single figure, 1D and 2D subplots
@@ -84,21 +90,24 @@ def pdos_plot_diagram(system, element=None, orbitals=[], spin_polarised=True, ax
             a = axs[ax_a]
         else:
             a = axs[ax_a, ax_b]
+        a.axvline(0, lw=0.5, color="Red", zorder=10, ls="-")
 
     for orbital in orbitals:
         if spin_polarised is True:
             val_up = pdos(element, orbital, 1)
             val_down = pdos(element, orbital, 2)
-            a.plot(x_total_axis, val_up, label="{}-{} (up)".format(element, orbital), color=color, lw=0.5)
-            a.plot(x_total_axis, -val_down,  label="{}-{} (down)".format(element, orbital),
-                   color=color, lw=0.5)
+            a.plot(x_total_axis, val_up, label=labela, color=color, lw=0.5)
+            a.plot(x_total_axis, -val_down,  label=labelb, color=color, lw=0.5)
+            a.fill_between(x_total_axis["E"], val_up, color=color, alpha=0.4)
+            a.fill_between(x_total_axis["E"], -val_down, color=color, alpha=0.4)
         else:
             val_up = pdos(element, orbital)
-            a.plot(x_total_axis, val_up, label="{}-{}".format(system, orbital), color=color, lw=0.5)
+            a.plot(x_total_axis, val_up, label=labela, color=color, lw=0.4)
+            a.fill_between(x_total_axis["E"], val_up, color=color, alpha=0.5)
 
     a.set_ylim(-y_total_axis_down["E"].max(), y_total_axis_up["E"].max())
     a.set_title(ax_title)
-
+    a.set_xlim(-20, 20)
     box = a.get_position()
     a.set_position([box.x0, box.y0, box.width * 0.95, box.height])
 
@@ -106,3 +115,4 @@ def pdos_plot_diagram(system, element=None, orbitals=[], spin_polarised=True, ax
     a.legend(loc='center left', bbox_to_anchor=(1, 0, 1, 1))
     # change directory home
     os.chdir(owd)
+    return a
