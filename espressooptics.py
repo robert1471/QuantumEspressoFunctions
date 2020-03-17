@@ -85,13 +85,13 @@ def reflectivity(refrac, extinct):
     return df
 
 
-def absorption_coefficient(epsr_file, extinct):
+def absorption_coefficient(extinct, x_axis=None):
     h = 6.63 * math.pow(10, -34)
     c = 3.00 * math.pow(10, 8)
     j = 1.60218 * math.pow(10, -19)
     df = pd.DataFrame(columns=["V"])
 
-    x_axis_eV = energy(epsr_file)
+    x_axis_eV = pd.DataFrame(data=x_axis, columns=["E"])
     combo = x_axis_eV.join(extinct)
     mult = pd.DataFrame(combo["E"] * combo["V"])
     for i, entry in mult.iterrows():
@@ -110,8 +110,10 @@ def energy_loss(real, imaginary):
         df.loc[i] = [n_ij]
     return df
 
+
 def eps_plot_all_diagram(system, data_loc="./", owd=os.getcwd(), rows=3, cols=2, ax_a=None, ax_b=None,
-                         color=(0, 0, 0), label="None", title=None):
+                         color=(0, 0, 0), label="None", title=None, program="espresso", vasp_x_axis=None,
+                         vasp_real=None, vasp_imag=None):
     os.chdir(data_loc)
     data_file_r = "epsr_{}.dat".format(system)
     data_file_i = "epsi_{}.dat".format(system)
@@ -130,15 +132,22 @@ def eps_plot_all_diagram(system, data_loc="./", owd=os.getcwd(), rows=3, cols=2,
     else:
         a = axs
 
-    x_axis = energy(data_file_r)
-    e_re = magnitude("epsr_{}.dat".format(system))
-    e_im = magnitude("epsi_{}.dat".format(system))
+    # program choice
+    if program == "espresso":
+        x_axis = energy(data_file_r)
+        e_re = magnitude("epsr_{}.dat".format(system))
+        e_im = magnitude("epsi_{}.dat".format(system))
+    elif program == "VASP":
+        x_axis = vasp_x_axis
+        e_re = vasp_real
+        e_im = vasp_imag
+    else:
+        raise NameError("Program Name specified is not valid: only \"espresso\" and \"VASP\" implemented")
 
     refrac = refractive_index(e_re, e_im)
     extinct = extinction(e_re, e_im)
     reflect = reflectivity(refrac=refrac, extinct=extinct)
-
-    epsilon = absorption_coefficient(epsr_file=data_file_r, extinct=extinct)
+    epsilon = absorption_coefficient(extinct=extinct, x_axis=x_axis)
     loss = energy_loss(e_re, e_im)
 
     features = [e_re, e_im, epsilon, refrac, reflect, loss]

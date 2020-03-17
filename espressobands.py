@@ -23,7 +23,8 @@ def Symmetries(fstring):
 # It then extracts the band data, and plots the bands, the fermi energy in red, and the high symmetry points
 
 
-def band_plot(datafile, fermi, symmetryfile, subplot, colour, highsympoints, label, labelloc, zorder=0):
+def band_plot(datafile, fermi, symmetryfile, subplot, colour, highsympoints, label, labelloc, zorder=0,
+              high_sym_line_color="Blue", fermi_color="Red"):
     z = np.loadtxt(datafile)  # This loads the bandx.dat.gnu file
     x = np.unique(z[:, 0])  # This is all the unique x-points
     bands = []
@@ -53,11 +54,11 @@ def band_plot(datafile, fermi, symmetryfile, subplot, colour, highsympoints, lab
     for j in temp:  # This is the high symmetry lines
         x1 = [j, j]
         x2 = [axis[2] - 50, axis[3] + 50]
-        subplot.plot(x1, x2, '--', lw=0.55, color='blue', alpha=0.9, zorder=0)
+        subplot.plot(x1, x2, '--', lw=0.55, color=high_sym_line_color, alpha=0.9, zorder=0)
         subplot.text(j, labelloc, highsympoints[val], va='center', ha='center', fontsize=10)
         val += 1
 
-    subplot.plot([min(x), max(x)], [Fermi - Fermi, Fermi - Fermi], '--', lw=1, color="red", zorder=zorder)
+    subplot.plot([min(x), max(x)], [Fermi - Fermi, Fermi - Fermi], '--', lw=1, color=fermi_color, zorder=zorder)
     subplot.set_xticklabels([])
     subplot.set_ylim(-Fermi, Fermi)
     subplot.set_xlim([axis[0], axis[1]])
@@ -95,13 +96,14 @@ def bandgap(datafile, fermi):
 
 
 def band_plot_diagram(system, ax_title="Untitled", data_loc="./", high_sym_points=None, fermi=0,
-                      color1="red", color2="darkblue", owd=os.getcwd(), rows=1, cols=1, ax_a=0, ax_b=None, zorder=0):
+                      color1="red", color2="darkblue", owd=os.getcwd(), rows=1, cols=1, ax_a=0, ax_b=None, zorder=0,
+                      high_sym_line_color="Blue", fermi_color="Red", figsize=None):
     global fig
     global axs
 
     # figure set up or check if file already defined to exist
     if "fig" not in globals():
-        fig, axs = plt.subplots(rows, cols, figsize=(6.4 * 2, 6.4), dpi=250)
+        fig, axs = plt.subplots(rows, cols, dpi=250, figsize=figsize)
 
     # if statement to allow for single figure, 1D and 2D subplots
     if rows == 1 and cols == 1:
@@ -117,17 +119,24 @@ def band_plot_diagram(system, ax_title="Untitled", data_loc="./", high_sym_point
     # get band gaps
     band_gap_1 = bandgap("1.{}.bands.dat.gnu".format(system), fermi)
     band_gap_2 = bandgap("2.{}.bands.dat.gnu".format(system), fermi)
+    print(band_gap_1)
+    print(band_gap_2)
 
     # plot bands
-    band_plot("2.{}.bands.dat.gnu".format(system), fermi, "2.bandx.out", a, color2, high_sym_points,
-              r"Spin down (E\textsubscript{{g}} = {} eV)".format(round(band_gap_2, 2)), -(fermi + 1), zorder=9)
     band_plot("1.{}.bands.dat.gnu".format(system), fermi, "1.bandx.out", a, color1, high_sym_points,
-              r"Spin up (E\textsubscript{{g}} = {} eV)".format(round(band_gap_1, 2)), -(fermi + 1), zorder=100)
+              r"Spin up (E\textsubscript{{g}} = {} eV)".format(round(band_gap_1, 2)), -(fermi + 0.8),
+              zorder=100, high_sym_line_color=high_sym_line_color, fermi_color=fermi_color)
+
+    band_plot("2.{}.bands.dat.gnu".format(system), fermi, "2.bandx.out", a, color2, high_sym_points,
+              r"Spin down (E\textsubscript{{g}} = {} eV)".format(round(band_gap_2, 2)), -(fermi + 0.8),
+              zorder=9, high_sym_line_color=high_sym_line_color, fermi_color=fermi_color)
+
+
 
 
     # style
     a.set_ylim((-10.5, 5))
-    a.set_xlabel("Wave Vector", fontsize=16, y=-1)
+    a.set_xlabel("Wave Vector", fontsize=16, y=-1.1)
     a.xaxis.set_ticks_position('none')
     a.xaxis.set_label_coords(0.5, -0.065)
     a.legend(framealpha=1)
