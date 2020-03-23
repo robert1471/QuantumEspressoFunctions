@@ -114,7 +114,10 @@ def energy_loss(real, imaginary):
 def eps_plot_all_diagram(system, data_loc="./", owd=os.getcwd(), rows=3, cols=2, ax_a=None, ax_b=None,
                          color=(0, 0, 0), label="None", title=None, program="espresso", vasp_x_axis=None,
                          vasp_real=None, vasp_imag=None):
-    os.chdir(data_loc)
+    if type(data_loc) == list:
+        os.chdir(data_loc[0])
+    else:
+        os.chdir(data_loc)
     data_file_r = "epsr_{}.dat".format(system)
     data_file_i = "epsi_{}.dat".format(system)
 

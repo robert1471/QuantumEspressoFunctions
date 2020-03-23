@@ -4,10 +4,7 @@ import numpy as np
 import os
 from matplotlib import pyplot as plt
 
-
 # This function extracts the high symmetry points from the output of bandx.out
-from numpy.core.multiarray import ndarray
-
 
 def Symmetries(fstring):
     f = open(fstring, 'r')
@@ -18,10 +15,8 @@ def Symmetries(fstring):
     f.close()
     return x
 
-
 # This function takes in the datafile, the fermi energy, the symmetry file, a subplot, and the label
 # It then extracts the band data, and plots the bands, the fermi energy in red, and the high symmetry points
-
 
 def band_plot(datafile, fermi, symmetryfile, subplot, colour, highsympoints, label, labelloc, zorder=0,
               high_sym_line_color="Blue", fermi_color="Red"):
@@ -130,9 +125,6 @@ def band_plot_diagram(system, ax_title="Untitled", data_loc="./", high_sym_point
     band_plot("2.{}.bands.dat.gnu".format(system), fermi, "2.bandx.out", a, color2, high_sym_points,
               r"Spin down (E\textsubscript{{g}} = {} eV)".format(round(band_gap_2, 2)), -(fermi + 0.8),
               zorder=9, high_sym_line_color=high_sym_line_color, fermi_color=fermi_color)
-
-
-
 
     # style
     a.set_ylim((-10.5, 5))
