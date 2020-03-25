@@ -3,8 +3,12 @@
 import numpy as np
 import os
 from matplotlib import pyplot as plt
+from termcolor import colored
+
 
 # This function extracts the high symmetry points from the output of bandx.out
+from numpy.core.multiarray import ndarray
+
 
 def Symmetries(fstring):
     f = open(fstring, 'r')
@@ -15,8 +19,10 @@ def Symmetries(fstring):
     f.close()
     return x
 
+
 # This function takes in the datafile, the fermi energy, the symmetry file, a subplot, and the label
 # It then extracts the band data, and plots the bands, the fermi energy in red, and the high symmetry points
+
 
 def band_plot(datafile, fermi, symmetryfile, subplot, colour, highsympoints, label, labelloc, zorder=0,
               high_sym_line_color="Blue", fermi_color="Red"):
@@ -60,7 +66,7 @@ def band_plot(datafile, fermi, symmetryfile, subplot, colour, highsympoints, lab
     subplot.set_ylabel(r'E - E\textsubscript{f} / eV', fontsize=16)
 
 
-def bandgap(datafile, fermi):
+def bandgap(datafile, fermi, spin=None):
     z = np.loadtxt(datafile)  # This loads the bandx.dat.gnu file
     x = np.unique(z[:, 0])  # This is all the unique x-points
     bands = []
@@ -78,15 +84,30 @@ def bandgap(datafile, fermi):
             bands[j][i][0] = x[i]
             bands[j][i][1] = np.multiply(sel[j][1], 1)
 
+    # This calculates the band gap (but does not determine direct or indirect!!)
     maxs = []
     mins = []
 
     for j, i in enumerate(bands):  # Here we plots the bands
-        if max(i[:, 1] - Fermi) < 0:  # This calculates the band gap (but does not determine direct or indirect!!)
+        if max(i[:, 1] - Fermi) < 0.5: # 0.5 to account for half metals with some states above
             maxs.append(max(i[:, 1]) - Fermi)
         if min(i[:, 1] - Fermi) > 0:
             mins.append(min(i[:, 1]) - Fermi)
     bandgap = min(mins) - max(maxs)
+
+    max_coords = colored(str(round(max(maxs), 2)), "red")
+    min_coords = colored(str(round(min(mins), 2)), "red")
+
+    if spin == 1:
+        print("The Energy value of the top of spin up the valance band is at {} eV".format(max_coords))
+        print("The Energy value of the bottom of the spin up conduction band is at {} eV".format(min_coords))
+    elif spin == 2:
+        print("The Energy value of the top of spin down the valance band is at {} eV".format(max_coords))
+        print("The Energy value of the bottom of the down up conduction band is at {} eV".format(min_coords))
+    else:
+        print("The Energy value of the top of the valance band is at {} eV".format(max_coords))
+        print("The Energy value of the bottom of up conduction band is at {} eV".format(min_coords))
+
     return bandgap
 
 
@@ -112,10 +133,11 @@ def band_plot_diagram(system, ax_title="Untitled", data_loc="./", high_sym_point
     os.chdir(data_loc)
 
     # get band gaps
-    band_gap_1 = bandgap("1.{}.bands.dat.gnu".format(system), fermi)
-    band_gap_2 = bandgap("2.{}.bands.dat.gnu".format(system), fermi)
-    print(band_gap_1)
-    print(band_gap_2)
+    band_gap_1 = bandgap("1.{}.bands.dat.gnu".format(system), fermi, spin=1)
+    band_gap_2 = bandgap("2.{}.bands.dat.gnu".format(system), fermi, spin=2)
+
+    print("The {} band gap is {} eV".format(colored("spin up", "cyan"), colored(str(round(band_gap_1, 2)), "red")))
+    print("The {} band gap is {} eV".format(colored("spin down", "cyan"), colored(str(round(band_gap_2, 2)), "red")))
 
     # plot bands
     band_plot("1.{}.bands.dat.gnu".format(system), fermi, "1.bandx.out", a, color1, high_sym_points,
@@ -125,6 +147,9 @@ def band_plot_diagram(system, ax_title="Untitled", data_loc="./", high_sym_point
     band_plot("2.{}.bands.dat.gnu".format(system), fermi, "2.bandx.out", a, color2, high_sym_points,
               r"Spin down (E\textsubscript{{g}} = {} eV)".format(round(band_gap_2, 2)), -(fermi + 0.8),
               zorder=9, high_sym_line_color=high_sym_line_color, fermi_color=fermi_color)
+
+
+
 
     # style
     a.set_ylim((-10.5, 5))

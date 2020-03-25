@@ -189,3 +189,5 @@ def eps_plot_all_diagram(system, data_loc="./", owd=os.getcwd(), rows=3, cols=2,
     plt.tight_layout(rect=(0, 0, 1, .925))
     fig.suptitle(title)
     os.chdir(owd)
+
+    # TODO: Add a function for only the Absorption Spectrum
