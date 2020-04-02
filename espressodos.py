@@ -5,7 +5,6 @@ import pandas as pd
 import re
 import os
 import warnings
-import collections
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
