@@ -56,11 +56,12 @@ def band_plot(datafile, fermi, symmetryfile, subplot, colour, highsympoints, lab
         x1 = [j, j]
         x2 = [axis[2] - 50, axis[3] + 50]
         subplot.plot(x1, x2, '--', lw=0.55, color=high_sym_line_color, alpha=0.9, zorder=0)
-        subplot.text(j, labelloc, highsympoints[val], va='center', ha='center', fontsize=10)
+        #subplot.text(j, labelloc, highsympoints[val], va='center', ha='center', fontsize=10)
         val += 1
 
     subplot.plot([min(x), max(x)], [Fermi - Fermi, Fermi - Fermi], '--', lw=1, color=fermi_color, zorder=zorder)
-    subplot.set_xticklabels([])
+    subplot.set_xticks(temp)
+    subplot.set_xticklabels(highsympoints, fontsize=10)
     subplot.set_ylim(-Fermi, Fermi)
     subplot.set_xlim([axis[0], axis[1]])
     subplot.set_ylabel(r'E - E\textsubscript{f} / eV', fontsize=16)
@@ -119,7 +120,7 @@ def band_plot_diagram(system, ax_title="Untitled", data_loc="./", high_sym_point
 
     # figure set up or check if file already defined to exist
     if "fig" not in globals():
-        fig, axs = plt.subplots(rows, cols, dpi=250, figsize=figsize)
+        fig, axs = plt.subplots(rows, cols, figsize=figsize)
 
     # if statement to allow for single figure, 1D and 2D subplots
     if rows == 1 and cols == 1:
