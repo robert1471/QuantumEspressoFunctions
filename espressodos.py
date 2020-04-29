@@ -5,41 +5,55 @@ import pandas as pd
 import re
 import os
 import warnings
+import collections
+
+rc('font', **{'family': 'serif', 'serif': ['Computer Modern']})
+rc('text', usetex=True)
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
 class Dos(object):
-    def __init__(self, file_path, system, species, orbitals, fermi):
+    def __init__(self, file_path, system, species, orbitals, fermi, labels=None, colors=None):
 
         self.file_path = file_path
         self.system = system
         self.species = species
         self.orbitals = orbitals
         self.fermi = fermi
+
+        if labels:
+            self.labels = labels
+        else:
+            self.labels = species
         self.owd = os.getcwd()
 
         self.pdos_file = "{}.pdos_tot".format(system)
+
+        if colors:
+            self.colors = colors
+        else:
+            self.colors = ["Blue", "DarkOrange", "Red", "Lime", "Cyan", "Magenta"]
 
         self.d_orbitals_up = {
             "dz2" : 3,
             "dzx" : 5,
             "dzy" : 7,
-            "dx2-y2" : 9,
-            "dxy" : 11
+            "dxy" : 9,
+            "dx2-y2" : 11
         }
         self.d_orbitals_down = {
             "dz2" : 4,
             "dzx" : 6,
             "dzy" : 8,
-            "dx2-y2" : 10,
-            "dxy" : 12
+            "dxy" : 10,
+            "dx2-y2" : 12
         }
         self.d_orbitals_colors = {
             "dz2" : "Red",
             "dzx" : "Lime",
             "dzy" : "DeepPink",
-            "dx2-y2" : "orange",
-            "dxy" : "cyan"
+            "dxy" : "cyan",
+            "dx2-y2": "orange"
         }
         self.p_orbitals_up = {
             "pz" : 3,
@@ -53,7 +67,7 @@ class Dos(object):
         }
         self.p_orbitals_colors = {
             "pz" : "Red",
-            "px" : "Dark Orange",
+            "px" : "Orange",
             "py" : "Green",
         }
 
@@ -114,7 +128,6 @@ class Dos(object):
         if spin == 1:
             if orbital == "d":
                 orbital_dict = {k: self.d_orbitals_up[k] for k in projected_orbitals}
-                print(orbital_dict)
             else:
                 orbital_dict = {k: self.p_orbitals_up[k] for k in projected_orbitals}
         elif spin == 2:
@@ -123,6 +136,7 @@ class Dos(object):
             else:
                 orbital_dict = {k: self.p_orbitals_down[k] for k in projected_orbitals}
 
+        print(orbital_dict)
         # sorting into df for and sum of each specified orbital
         x = 0
         df_master = pd.DataFrame(columns = [value for value in orbital_dict])
@@ -139,7 +153,6 @@ class Dos(object):
                 else:
                     df_master.add(df, fill_value=1)
                 x += 1
-
         return df_master
 
 
@@ -152,47 +165,47 @@ class Dos(object):
         return data["E"].to_numpy()
 
 
-    def total_dos(self):
+    def total_dos(self, spin=None):
         # total dos data
-        y_total_axis_up = self.axis(1)
-        y_total_axis_down = self.axis(2)
-        df = pd.concat([y_total_axis_up, y_total_axis_down], axis=1, names=["Spin up", "Spin down"])
-        return df
+        y_total_axis = self.axis(spin)
+        return y_total_axis
 
-    """a.plot(x_total_axis, y_total_axis_up, label="Total", color=tot_color, lw=0.5)
-        a.plot(x_total_axis, -y_total_axis_down, label=None, color=tot_color, lw=0.5)
-        a.fill_between(x_total_axis["E"], y_total_axis_up["E"], color="black", alpha=0.1)
-        a.fill_between(x_total_axis["E"], -y_total_axis_down["E"], color="black", alpha=0.1)"""
-
-    def pdos_plot_diagram(self, spin_polarised=True, ax_title="Untitled", data_loc="./",
+    def pdos_plot_diagram(self, spin_polarised=True, ax_title="Untitled",
                           labela="Spin Up", labelb="Spin Down", scalar=1, totaldos=False, orbital_projected=False,
                           projected_orbitals=None):
-
+        
+        # figure set up or check if file already defined to exist
         fig, axs = plt.subplots()
-
         # change to data location
-        os.chdir(data_loc)
-
+        os.chdir(self.file_path)
         # x axis
         x_axis = self.axis(row=0) - self.fermi
+        
+        if totaldos:
+            total_up = self.total_dos(spin=1)
+            total_down = self.total_dos(spin=2)
+            plt.plot(x_axis, total_up, color="black")
+            plt.plot(x_axis, -total_down, color="black")
 
-        #axs.axvline(0, lw=0.5, color="Red", zorder=10, ls="-")
-        for orbital, element in zip(self.orbitals, self.species):
+        axs.axvline(0, lw=0.5, color="Black", zorder=10, ls="-")
+        for orbital, element, colour, label in zip(self.orbitals, self.species, self.colors, self.labels):
             if spin_polarised == True:
                 if orbital_projected == True:
-
                     # colours
                     if orbital == "d":
                         colors = self.d_orbitals_colors
+
                     elif orbital == "p":
                         colors = self.p_orbitals_colors
 
                     # use all orbitals if none specified
-                    if projected_orbitals == None and orbital == "d":
-                        projected_orbitals = self.d_orbitals_up.keys()
-                    elif projected_orbitals == None and orbital == "p":
-                        projected_orbitals = self.p_orbitals_up.keys()
+                    if orbital == "d":
+                        if projected_orbitals == None:
+                            projected_orbitals = self.d_orbitals_up.keys()
 
+                    elif orbital == "p":
+                        if projected_orbitals == None or self.d_orbitals_up.keys():
+                            projected_orbitals = self.p_orbitals_up.keys()
 
                     # data
                     val_up = self.orbital_pdos(species=element, orbital=orbital,
@@ -210,7 +223,6 @@ class Dos(object):
                     for entry in projected_orbitals:
                         axs.plot(x_axis, scalar * val_up[entry], label=entry, color=colors[entry], lw=0.5)
                         axs.plot(x_axis, scalar * -val_down[entry], color=colors[entry], lw=0.5)
-
                         axs.fill_between(x_axis, scalar * val_up[entry], color=colors[entry], alpha=0.4)
                         axs.fill_between(x_axis, scalar * -val_down[entry], color=colors[entry], alpha=0.4)
 
@@ -224,20 +236,23 @@ class Dos(object):
                         val_up = val_up[val:]
                         val_down = val_down[val:]
 
-                    #data = pd.concat([x_axis, val_up, val_down], axis=1, names=["x_axis", "val_up", "val_down"])
-                    axs.plot(x_axis, val_up)
-                    axs.plot(x_axis, scalar * -val_down,  label=labelb, color="red", lw=0.5)
+                    axs.plot(x_axis, scalar * val_up, color=colour, lw=0.5)
+                    axs.plot(x_axis, scalar * -val_down,  label=label, color=colour, lw=0.5)
 
-                    axs.fill_between(x_axis, scalar * val_up, color="red", alpha=0.4)
-                    axs.fill_between(x_axis, scalar * -val_down, color="Red", alpha=0.4)
+                    axs.fill_between(x_axis, scalar * val_up, color=colour, alpha=0.4)
+                    axs.fill_between(x_axis, scalar * -val_down, color=colour, alpha=0.4)
             else:
                 val_up = self.pdos(element, orbital)
                 axs.plot(x_axis, val_up, label=labela, color=color, lw=0.4)
                 axs.fill_between(x_axis["E"], scalar * val_up, color=color, alpha=0.5)
 
         #axs.set_ylim(-self.y_total_axis_down.max(), self.y_total_axis_up.max())
-        axs.set_title(ax_title)
+        axs.set_title(ax_title, fontsize=20)
         axs.set_xlim(-20, 20)
+        axs.set_xlabel(r"E -- E\textsubscript{F} / eV", fontsize=14)
+        axs.set_ylabel(r"Density of States", fontsize=14)
+
+        fig.set_size_inches(10, 6)
         box = axs.get_position()
         axs.set_position([box.x0, box.y0, box.width * 0.95, box.height])
 

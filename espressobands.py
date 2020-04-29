@@ -4,12 +4,21 @@ import numpy as np
 import os
 from matplotlib import pyplot as plt
 from termcolor import colored
-
-
+from matplotlib import rc
 # This function extracts the high symmetry points from the output of bandx.out
 from numpy.core.multiarray import ndarray
+rc('font', **{'family': 'serif', 'serif': ['Computer Modern']})
+rc('text', usetex=True)
 
-
+"""
+class Bands(Object):
+    def __init__(self, data_loc="./", datafile="", fermi=None, high_sym_line_color="blue", fermi_color="black"):
+        self.dataloc = data_loc
+        self.fermi = fermi
+        self.datafile = datafile
+        self.high_sym_line_color = high_sym_line_color
+        self.fermi_color = fermi_color
+"""
 def Symmetries(fstring):
     f = open(fstring, 'r')
     x = np.zeros(0)
@@ -20,12 +29,12 @@ def Symmetries(fstring):
     return x
 
 
-# This function takes in the datafile, the fermi energy, the symmetry file, a subplot, and the label
-# It then extracts the band data, and plots the bands, the fermi energy in red, and the high symmetry points
+def band_plot(datafile, fermi, symmetryfile, subplot, colour, highsympoints, label, labelloc, high_sym_line_color,
+              fermi_color, zorder=10):
 
+    # This function takes in the datafile, the fermi energy, the symmetry file, a subplot, and the label
+    # It then extracts the band data, and plots the bands, the fermi energy in red, and the high symmetry points
 
-def band_plot(datafile, fermi, symmetryfile, subplot, colour, highsympoints, label, labelloc, zorder=0,
-              high_sym_line_color="Blue", fermi_color="Red"):
     z = np.loadtxt(datafile)  # This loads the bandx.dat.gnu file
     x = np.unique(z[:, 0])  # This is all the unique x-points
     bands = []
@@ -55,11 +64,11 @@ def band_plot(datafile, fermi, symmetryfile, subplot, colour, highsympoints, lab
     for j in temp:  # This is the high symmetry lines
         x1 = [j, j]
         x2 = [axis[2] - 50, axis[3] + 50]
-        subplot.plot(x1, x2, '--', lw=0.55, color=high_sym_line_color, alpha=0.9, zorder=0)
+        subplot.plot(x1, x2, '--', lw=0.5, color=high_sym_line_color, alpha=0.9, zorder=0)
         #subplot.text(j, labelloc, highsympoints[val], va='center', ha='center', fontsize=10)
         val += 1
 
-    subplot.plot([min(x), max(x)], [Fermi - Fermi, Fermi - Fermi], '--', lw=1, color=fermi_color, zorder=zorder)
+    subplot.plot([min(x), max(x)], [Fermi - Fermi, Fermi - Fermi], '-', lw=0.5, color=fermi_color, zorder=10)
     subplot.set_xticks(temp)
     subplot.set_xticklabels(highsympoints, fontsize=10)
     subplot.set_ylim(-Fermi, Fermi)
@@ -89,17 +98,21 @@ def bandgap(datafile, fermi, spin=None):
     maxs = []
     mins = []
 
-    for j, i in enumerate(bands):  # Here we plots the bands
-        if max(i[:, 1] - Fermi) < 0.5: # 0.5 to account for half metals with some states above
+    for j, i in enumerate(bands):  # for each band
+        if min(abs(i[:, 1] - Fermi)) < 0.01:
+            bandgap = 0
+            return bandgap
+        if max(i[:, 1] - Fermi) < 0: # 0.5 to account for half metals with some states above
             maxs.append(max(i[:, 1]) - Fermi)
         if min(i[:, 1] - Fermi) > 0:
             mins.append(min(i[:, 1]) - Fermi)
+
     bandgap = min(mins) - max(maxs)
 
     max_coords = colored(str(round(max(maxs), 2)), "red")
     min_coords = colored(str(round(min(mins), 2)), "red")
 
-    if spin == 1:
+    """if spin == 1:
         print("The Energy value of the top of spin up the valance band is at {} eV".format(max_coords))
         print("The Energy value of the bottom of the spin up conduction band is at {} eV".format(min_coords))
     elif spin == 2:
@@ -107,14 +120,14 @@ def bandgap(datafile, fermi, spin=None):
         print("The Energy value of the bottom of the down up conduction band is at {} eV".format(min_coords))
     else:
         print("The Energy value of the top of the valance band is at {} eV".format(max_coords))
-        print("The Energy value of the bottom of up conduction band is at {} eV".format(min_coords))
+        print("The Energy value of the bottom of up conduction band is at {} eV".format(min_coords))"""
 
     return bandgap
 
 
 def band_plot_diagram(system, ax_title="Untitled", data_loc="./", high_sym_points=None, fermi=0,
-                      color1="red", color2="darkblue", owd=os.getcwd(), rows=1, cols=1, ax_a=0, ax_b=None, zorder=0,
-                      high_sym_line_color="Blue", fermi_color="Red", figsize=None):
+                      color1="Black", color2="Red", owd=os.getcwd(), rows=1, cols=1, ax_a=0, ax_b=None, zorder=0,
+                      high_sym_line_color="Black", fermi_color="Black", figsize=None):
     global fig
     global axs
 
@@ -153,6 +166,7 @@ def band_plot_diagram(system, ax_title="Untitled", data_loc="./", high_sym_point
 
 
     # style
+    fig.set_size_inches(6 * rows, 6)
     a.set_ylim((-10.5, 5))
     a.set_xlabel("Wave Vector", fontsize=16, y=-1.1)
     a.xaxis.set_ticks_position('none')
