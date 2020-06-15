@@ -125,7 +125,7 @@ def bandgap(datafile, fermi, spin=None):
     return bandgap
 
 
-def band_plot_diagram(system, ax_title="Untitled", data_loc="./", high_sym_points=None, fermi=0,
+def band_plot_diagram(system, spin_polarised=True, ax_title="Untitled", data_loc="./", high_sym_points=None, fermi=0,
                       color1="Black", color2="Red", owd=os.getcwd(), rows=1, cols=1, ax_a=0, ax_b=None, zorder=0,
                       high_sym_line_color="Black", fermi_color="Black", figsize=None):
     global fig
@@ -146,24 +146,29 @@ def band_plot_diagram(system, ax_title="Untitled", data_loc="./", high_sym_point
     # change to data location
     os.chdir(data_loc)
 
-    # get band gaps
-    band_gap_1 = bandgap("1.{}.bands.dat.gnu".format(system), fermi, spin=1)
-    band_gap_2 = bandgap("2.{}.bands.dat.gnu".format(system), fermi, spin=2)
+    if spin_polarised:
+        # get band gaps
+        band_gap_1 = bandgap("1.{}.bands.dat.gnu".format(system), fermi, spin=1)
+        band_gap_2 = bandgap("2.{}.bands.dat.gnu".format(system), fermi, spin=2)
 
-    print("The {} band gap is {} eV".format(colored("spin up", "cyan"), colored(str(round(band_gap_1, 2)), "red")))
-    print("The {} band gap is {} eV".format(colored("spin down", "cyan"), colored(str(round(band_gap_2, 2)), "red")))
+        print("The {} band gap is {} eV".format(colored("spin up", "cyan"), colored(str(round(band_gap_1, 2)), "red")))
+        print("The {} band gap is {} eV".format(colored("spin down", "cyan"), colored(str(round(band_gap_2, 2)), "red")))
 
-    # plot bands
-    band_plot("1.{}.bands.dat.gnu".format(system), fermi, "1.bandx.out", a, color1, high_sym_points,
-              r"Spin up (E\textsubscript{{g}} = {} eV)".format(round(band_gap_1, 2)), -(fermi + 0.8),
-              zorder=100, high_sym_line_color=high_sym_line_color, fermi_color=fermi_color)
+        # plot bands
+        band_plot("1.{}.bands.dat.gnu".format(system), fermi, "1.bandx.out", a, color1, high_sym_points,
+                  r"Spin up (E\textsubscript{{g}} = {} eV)".format(round(band_gap_1, 2)), -(fermi + 0.8),
+                  zorder=100, high_sym_line_color=high_sym_line_color, fermi_color=fermi_color)
 
-    band_plot("2.{}.bands.dat.gnu".format(system), fermi, "2.bandx.out", a, color2, high_sym_points,
-              r"Spin down (E\textsubscript{{g}} = {} eV)".format(round(band_gap_2, 2)), -(fermi + 0.8),
-              zorder=9, high_sym_line_color=high_sym_line_color, fermi_color=fermi_color)
+        band_plot("2.{}.bands.dat.gnu".format(system), fermi, "2.bandx.out", a, color2, high_sym_points,
+                  r"Spin down (E\textsubscript{{g}} = {} eV)".format(round(band_gap_2, 2)), -(fermi + 0.8),
+                  zorder=9, high_sym_line_color=high_sym_line_color, fermi_color=fermi_color)
+    else:
+        band_gap = bandgap("{}.bands.dat.gnu".format(system), fermi, spin=None)
+        print("The band gap is {} eV".format(colored(str(round(band_gap, 2)), "red")))
 
-
-
+        band_plot("{}.bands.dat.gnu".format(system), fermi, "bandx.out", a, color1, high_sym_points,
+                  r"E\textsubscript{{g}} = {} eV".format(round(band_gap, 2)), -(fermi + 0.8),
+                  zorder=100, high_sym_line_color=high_sym_line_color, fermi_color=fermi_color)
 
     # style
     fig.set_size_inches(6 * rows, 6)

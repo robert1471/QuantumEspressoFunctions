@@ -38,15 +38,17 @@ class Dos(object):
             "dz2" : 3,
             "dzx" : 5,
             "dzy" : 7,
-            "dxy" : 9,
-            "dx2-y2" : 11
+            "dx2-y2": 9,
+            "dxy" : 11,
+
         }
         self.d_orbitals_down = {
             "dz2" : 4,
             "dzx" : 6,
             "dzy" : 8,
-            "dxy" : 10,
-            "dx2-y2" : 12
+            "dx2-y2": 10,
+            "dxy" : 12,
+
         }
         self.d_orbitals_colors = {
             "dz2" : "Red",
